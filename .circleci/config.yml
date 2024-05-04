@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: cimg/python:3.6.1
 
     working_directory: ~/osc_gen
 
@@ -41,6 +41,9 @@ jobs:
       - store_artifacts:
           path: test-report.xml
           destination: test-report.xml
+
+      - store_test_results:
+        path: test-report.xml
 
   deploy:
     docker:
