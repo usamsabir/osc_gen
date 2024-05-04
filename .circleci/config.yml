@@ -22,14 +22,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            which python3
-            echo "creating venv"
-            python3 -m venv venv
-            echo "activating venv"
-            venv/bin/activate
-            echo "updating pip"
-            python -m pip install --upgrade pip
-            echo "installing requirements"
+            which pip
             pip install -r requirements.txt
 
       - save_cache:
