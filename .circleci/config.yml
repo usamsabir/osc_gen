@@ -38,12 +38,11 @@ jobs:
             . venv/bin/activate
             python -m pytest --junitxml=test-report.xml
 
+      - store_test_results
+
       - store_artifacts:
           path: test-report.xml
           destination: test-report.xml
-
-      - store_test_results:
-        path: test-report.xml
 
   deploy:
     docker:
