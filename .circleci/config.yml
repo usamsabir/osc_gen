@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/python:3.6.1
+      - image: cimg/python:3.6
 
     working_directory: ~/osc_gen
 
