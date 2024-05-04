@@ -23,7 +23,7 @@ import numpy as np
 from osc_gen import dsp
 
 
-class SigGen(object):
+class SigGen:
     """ Signal Generator """
 
     def __init__(self, num_points=128, amp=1.0, phase=0, harmonic=0):
@@ -178,12 +178,13 @@ class SigGen(object):
             of a wave
         """
 
+        dtype = type(data)
+
         try:
-            dtype = type(data)
             if not isinstance(data, np.ndarray):
                 data = np.array(list(data)).astype(np.float32)
-        except ValueError:
-            raise ValueError("Expected a sequence of data, got type {}.".format(dtype))
+        except ValueError as exp:
+            raise ValueError(f"Expected a sequence of data, got type {dtype}.") from exp
 
         if data.size == self.num_points:
             return data
@@ -265,9 +266,7 @@ def _morph_many(waves, gaps):
             else:
                 start = 0
 
-            morphed.extend(
-                [x for x in _morph_two(
-                    prev_wave, curr_wave, gaps[i])][start:])
+            morphed.extend(list(_morph_two(prev_wave, curr_wave, gaps[i]))[start:])
             i += 1
 
         prev_wave = curr_wave

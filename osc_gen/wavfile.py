@@ -36,14 +36,14 @@ def _float_to_ibytes(vals):
     afloats = np.array(vals)
     afloats = (afloats * 32768).astype('int')
     np.clip(afloats, -32768, 32767, out=afloats)
-    return struct.pack('<{0}h'.format(num), *(aval for aval in afloats))
+    return struct.pack(f'<{num}h', *(aval for aval in afloats))
 
 
 def _ibytes_to_float(vals):
 
     num = len(vals)
     num = int(num / 4)
-    afloats = struct.unpack('<{0}h'.format(num), vals)
+    afloats = struct.unpack(f'<{num}h', vals)
     afloats = np.array(afloats).astype(float)
     afloats /= 32768.0
     return afloats

@@ -181,8 +181,7 @@ def downsample(inp, factor):
     """
 
     if factor < 1:
-        raise ValueError(
-            "Downsampling factor ({0}) cannot be < 1".format(factor))
+        raise ValueError(f"Downsampling factor ({factor}) cannot be < 1")
 
     if factor == 1:
         return inp

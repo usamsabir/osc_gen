@@ -31,7 +31,7 @@ def write_wavetable(wavetable, filename):
     if table_size is None:
         return
 
-    with open(filename, 'w') as osc_file:
+    with open(filename, 'w', encoding="UTF-8") as osc_file:
 
         osc_file.write("#defaults=no\n")
         osc_file.write("#cm=OSC\n")
@@ -60,7 +60,7 @@ def write_wavetable(wavetable, filename):
                 osc_file.write("Wave[")
                 osc_file.write(str(index))
                 osc_file.write("] = ")
-                osc_file.write('{0:.10f}'.format(value))
+                osc_file.write(f'{value:.10f}')
                 osc_file.write(";\n")
 
             osc_file.write("Selected.WaveTable.set(")

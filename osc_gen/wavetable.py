@@ -28,7 +28,7 @@ from osc_gen import sig
 from osc_gen import zosc
 
 
-class WaveTable(object):
+class WaveTable:
     """ An n-slot wavetable """
 
     def __init__(self, num_slots, waves=None, wave_len=None):
