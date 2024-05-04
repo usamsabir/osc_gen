@@ -48,9 +48,9 @@ def main():
 
     for waves, title in zip(wave_sets, titles):
         wtab = wavetable.WaveTable(len(waves), waves)
-        save = os.path.join('examples', 'images', "{}.png".format(title))
+        save = os.path.join('examples', 'images', f"{title}.png")
         visualize.plot_wavetable(wtab, title=title, save=save)
-        wavfile.write_wavetable(wtab, "{}.wav".format(title))
+        wavfile.write_wavetable(wtab, f"{title}.wav")
 
 
 if __name__ == '__main__':

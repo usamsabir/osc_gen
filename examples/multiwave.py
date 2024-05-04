@@ -21,15 +21,19 @@ This file is part of osc_gen.
 # This example combines multiple single-cycle wav files into a WaveTable.
 
 import os
+import sys
 import argparse
 
 import numpy as np
 import soundfile as sf
 
+from example import make_osc_path
+
 from osc_gen import visualize
 from osc_gen import wavetable
 from osc_gen import wavfile
 from osc_gen import zosc
+
 
 STORE_FILES = True
 SHOW_PLOTS = True
@@ -60,28 +64,16 @@ HELP_SORT = (
 HELP_NAME = 'Name of the output file.'
 
 
-def make_osc_path():
-    """ Create or derive the path in which to store generated oscillator files.
-    """
-
-    home = '.'
-    osc_path = 'example_files'
-    if not os.path.exists(osc_path):
-        os.mkdir(osc_path)
-
-    return os.path.join(home, osc_path)
-
-
 def render(zwt, name):
     """ Write to file or plot a wavetable """
 
     if STORE_FILES:
         osc_path = make_osc_path()
         fname = os.path.join(osc_path, name + '.h2p')
-        print("Saving to {}".format(fname))
+        print(f"Saving to {fname}")
         zosc.write_wavetable(zwt, fname)
         fname = os.path.join(osc_path, name + '.wav')
-        print("Saving to {}".format(fname))
+        print(f"Saving to {fname}")
         wavfile.write_wavetable(zwt, fname)
     if SHOW_PLOTS:
         visualize.plot_wavetable(zwt, title=name)
@@ -97,16 +89,16 @@ def check_args(args, parser):
         parser.error('Minimum wave_len is 2')
 
     if not os.path.exists(args.cycle_dir):
-        parser.error("error: Directory {} does not exist.".format(args.cycle_dir))
+        parser.error(f"error: Directory {args.cycle_dir} does not exist.")
 
     if not os.path.isdir(args.cycle_dir):
-        parser.error("error: {} is not a directory.".format(args.cycle_dir))
+        parser.error(f"error: {args.cycle_dir} is not a directory.")
 
     if args.sort not in ('alpha', 'reverse', 'random'):
-        parser.error("{} is not a valid sort option.".format(args.sort))
+        parser.error(f"{args.sort} is not a valid sort option.")
 
     if args.select not in ('first', 'last', 'even'):
-        parser.error("{} is not a valid select option.".format(args.select))
+        parser.error(f"{args.select} is not a valid select option.")
 
 
 def main():
@@ -127,20 +119,20 @@ def main():
 
     wavfiles = []
 
-    print("Looking in directory {}".format(args.cycle_dir))
+    print(f"Looking in directory {args.cycle_dir}")
 
     for x in os.listdir(args.cycle_dir):
         if x.lower().endswith('.wav'):
             wavfiles.append(os.path.join(args.cycle_dir, x))
 
-    print("Found {} wav files.".format(len(wavfiles)))
+    print(f"Found {len(wavfiles)} wav files.")
 
     if len(wavfiles) < zwt.num_slots:
-        print("error: {} .wav files found in {}. Expected at least {}".format(
-            len(wavfiles), args.cycle_dir, zwt.num_slots))
-        exit()
+        print(f"error: {len(wavfiles)} .wav files found in {args.cycle_dir}. "
+              f"Expected at least {zwt.num_slots}")
+        sys.exit()
 
-    print("Sorting wav files using {}.".format(args.sort))
+    print(f"Sorting wav files using {args.sort}.")
 
     if args.sort == 'alpha':
         wavfiles.sort()
@@ -149,7 +141,7 @@ def main():
     elif args.sort == 'random':
         np.random.shuffle(wavfiles)
 
-    print("Selecting wav files using {}.".format(args.select))
+    print(f"Selecting wav files using {args.select}.")
 
     if args.select == 'first':
         wavfiles = wavfiles[:zwt.num_slots]

@@ -30,8 +30,8 @@ def main():
     """ convert wav file to wavetable using slicing and resynthesis """
 
     if len(sys.argv) < 3:
-        print("Usage: {0} WAV_FILE CYCLES".format(sys.argv[0]))
-        exit()
+        print(f"Usage: {sys.argv[0]} WAV_FILE CYCLES")
+        sys.exit()
 
     lib_path = '.'
 
@@ -40,16 +40,16 @@ def main():
 
     # resynthesize
     wt = wavetable.WaveTable(128)
-    wt.from_wav('{0}.wav'.format(name), sig_gen=sig_gen, resynthesize=True)
-    out = os.path.join(lib_path, '{0}_resynth.h2p'.format(name))
-    print("write {}".format(out))
+    wt.from_wav(f'{name}.wav', sig_gen=sig_gen, resynthesize=True)
+    out = os.path.join(lib_path, f'{name}_resynth.h2p')
+    print(f"write {out}")
     zosc.write_wavetable(wt, out)
 
     # slice
     wt = wavetable.WaveTable(128)
-    wt.from_wav('{0}.wav'.format(name), sig_gen=sig_gen)
-    out = os.path.join(lib_path, '{0}_slice.h2p'.format(name))
-    print("write {}".format(out))
+    wt.from_wav(f'{name}.wav', sig_gen=sig_gen)
+    out = os.path.join(lib_path, f'{name}_slice.h2p')
+    print(f"write {out}")
     zosc.write_wavetable(wt, out)
 
 
