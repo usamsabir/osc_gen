@@ -40,7 +40,7 @@ jobs:
             python -m pytest --junitxml=test-report/test-report.xml
 
       - store_test_results:
-        path: test-report
+          path: test-report
 
       - store_artifacts:
           path: test-report.xml
