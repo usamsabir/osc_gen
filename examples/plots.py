@@ -19,12 +19,14 @@ This file is part of osc_gen.
 """
 
 import os
+
 import numpy as np
-from osc_gen import wavetable, dsp, sig, visualize, wavfile
+
+from osc_gen import dsp, sig, visualize, wavetable, wavfile
 
 
 def main():
-    """ main function """
+    """main function"""
 
     sgen = sig.SigGen(1024)
 
@@ -36,22 +38,32 @@ def main():
         [dsp.slew(sgen.sqr(), x) for x in np.linspace(0.001, 0.1, 16)],
         [dsp.downsample(sgen.sin(), x * 4) for x in range(1, 9)],
         [dsp.quantize(sgen.sin(), x) for x in range(9, 1, -1)],
-        [sgen.noise(0, 0.01),
-         sgen.exp_saw(),
-         sgen.exp_sin(3),
-         sgen.sqr_saw(0.75),
-         sgen.sharkfin(0.04)]
+        [
+            sgen.noise(0, 0.01),
+            sgen.exp_saw(),
+            sgen.exp_sin(3),
+            sgen.sqr_saw(0.75),
+            sgen.sharkfin(0.04),
+        ],
     ]
 
-    titles = ('clip', 'tube', 'fold', 'shape', 'slew', 'downsample',
-              'quantize', 'fin_exp_sqrsaw')
+    titles = (
+        "clip",
+        "tube",
+        "fold",
+        "shape",
+        "slew",
+        "downsample",
+        "quantize",
+        "fin_exp_sqrsaw",
+    )
 
     for waves, title in zip(wave_sets, titles):
         wtab = wavetable.WaveTable(len(waves), waves)
-        save = os.path.join('examples', 'images', f"{title}.png")
+        save = os.path.join("examples", "images", f"{title}.png")
         visualize.plot_wavetable(wtab, title=title, save=save)
         wavfile.write_wavetable(wtab, f"{title}.wav")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

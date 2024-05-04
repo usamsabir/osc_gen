@@ -20,10 +20,10 @@ This file is part of osc_gen.
 
 
 def write_wavetable(wavetable, filename):
-    """ Write wavetable to an h2p oscillator file
+    """Write wavetable to an h2p oscillator file
 
-        @param wavetable zwave.WaveTable : Wavetable
-        @param filename str : File name to write to
+    @param wavetable zwave.WaveTable : Wavetable
+    @param filename str : File name to write to
     """
 
     table_size = wavetable.wave_len
@@ -31,7 +31,7 @@ def write_wavetable(wavetable, filename):
     if table_size is None:
         return
 
-    with open(filename, 'w', encoding="UTF-8") as osc_file:
+    with open(filename, "w", encoding="UTF-8") as osc_file:
 
         osc_file.write("#defaults=no\n")
         osc_file.write("#cm=OSC\n")
@@ -60,7 +60,7 @@ def write_wavetable(wavetable, filename):
                 osc_file.write("Wave[")
                 osc_file.write(str(index))
                 osc_file.write("] = ")
-                osc_file.write(f'{value:.10f}')
+                osc_file.write(f"{value:.10f}")
                 osc_file.write(";\n")
 
             osc_file.write("Selected.WaveTable.set(")

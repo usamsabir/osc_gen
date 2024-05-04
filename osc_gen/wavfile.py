@@ -20,30 +20,32 @@ This file is part of osc_gen.
 
 try:
     import soundfile as sf
+
     HAS_SOUNDFILE = True
 except ImportError:
     HAS_SOUNDFILE = False
 
-import wave
 import struct
+import wave
+
 import numpy as np
 
 
 def _float_to_ibytes(vals):
-    """ Convert a sequence of vals to 16-bit bytes """
+    """Convert a sequence of vals to 16-bit bytes"""
 
     num = len(vals)
     afloats = np.array(vals)
-    afloats = (afloats * 32768).astype('int')
+    afloats = (afloats * 32768).astype("int")
     np.clip(afloats, -32768, 32767, out=afloats)
-    return struct.pack(f'<{num}h', *(aval for aval in afloats))
+    return struct.pack(f"<{num}h", *(aval for aval in afloats))
 
 
 def _ibytes_to_float(vals):
 
     num = len(vals)
     num = int(num / 4)
-    afloats = struct.unpack(f'<{num}h', vals)
+    afloats = struct.unpack(f"<{num}h", vals)
     afloats = np.array(afloats).astype(float)
     afloats /= 32768.0
     return afloats
@@ -51,7 +53,7 @@ def _ibytes_to_float(vals):
 
 def _read_using_wave(filename):
 
-    wave_file = wave.open(filename, 'r')
+    wave_file = wave.open(filename, "r")
 
     if wave_file.getnchannels() != 1:
         raise ValueError("only mono supported")
@@ -67,7 +69,7 @@ def _read_using_wave(filename):
 
 
 def read(filename, with_sample_rate=False):
-    """ Read wav file and convert to normalized float """
+    """Read wav file and convert to normalized float"""
 
     if HAS_SOUNDFILE:
         data, fs = sf.read(filename)
@@ -92,9 +94,9 @@ def read(filename, with_sample_rate=False):
 
 
 def write(data, filename, samplerate=44100):
-    """ Write wav file """
+    """Write wav file"""
 
-    wave_file = wave.open(filename, 'w')
+    wave_file = wave.open(filename, "w")
     wave_file.setframerate(samplerate)
     wave_file.setnchannels(1)
     wave_file.setsampwidth(2)
@@ -103,9 +105,9 @@ def write(data, filename, samplerate=44100):
 
 
 def write_wavetable(wavetable, filename, samplerate=44100):
-    """ Write wavetable to file """
+    """Write wavetable to file"""
 
-    wave_file = wave.open(filename, 'w')
+    wave_file = wave.open(filename, "w")
     wave_file.setframerate(samplerate)
     wave_file.setnchannels(1)
     wave_file.setsampwidth(2)

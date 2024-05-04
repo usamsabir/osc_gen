@@ -19,39 +19,39 @@ This file is part of osc_gen.
 """
 
 from __future__ import print_function
+
 import os
 import sys
 
-from osc_gen import wavetable
-from osc_gen import zosc
-from osc_gen import sig
+from osc_gen import sig, wavetable, zosc
+
 
 def main():
-    """ convert wav file to wavetable using slicing and resynthesis """
+    """convert wav file to wavetable using slicing and resynthesis"""
 
     if len(sys.argv) < 3:
         print(f"Usage: {sys.argv[0]} WAV_FILE CYCLES")
         sys.exit()
 
-    lib_path = '.'
+    lib_path = "."
 
     name = os.path.splitext(sys.argv[1])[0]
     sig_gen = sig.SigGen(num_points=int(sys.argv[2]))
 
     # resynthesize
     wt = wavetable.WaveTable(128)
-    wt.from_wav(f'{name}.wav', sig_gen=sig_gen, resynthesize=True)
-    out = os.path.join(lib_path, f'{name}_resynth.h2p')
+    wt.from_wav(f"{name}.wav", sig_gen=sig_gen, resynthesize=True)
+    out = os.path.join(lib_path, f"{name}_resynth.h2p")
     print(f"write {out}")
     zosc.write_wavetable(wt, out)
 
     # slice
     wt = wavetable.WaveTable(128)
-    wt.from_wav(f'{name}.wav', sig_gen=sig_gen)
-    out = os.path.join(lib_path, f'{name}_slice.h2p')
+    wt.from_wav(f"{name}.wav", sig_gen=sig_gen)
+    out = os.path.join(lib_path, f"{name}_slice.h2p")
     print(f"write {out}")
     zosc.write_wavetable(wt, out)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

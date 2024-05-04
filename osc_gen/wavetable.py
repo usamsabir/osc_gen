@@ -18,18 +18,15 @@ This file is part of osc_gen.
     along with osc_gen.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
+
 import numpy as np
 
-from osc_gen import wavfile
-from osc_gen import dsp
-from osc_gen import sig
-from osc_gen import zosc
+from osc_gen import dsp, sig, wavfile, zosc
 
 
 class WaveTable:
-    """ An n-slot wavetable """
+    """An n-slot wavetable"""
 
     def __init__(self, num_slots, waves=None, wave_len=None):
         """
@@ -49,25 +46,27 @@ class WaveTable:
 
     @property
     def waves(self):
-        """ wavetable waves """
+        """wavetable waves"""
         return self._waves
 
     @waves.setter
     def waves(self, value):
 
-        if hasattr(value, '__iter__') and value:
+        if hasattr(value, "__iter__") and value:
 
             if self.wave_len is None:
                 self.wave_len = len(value[0])
                 self._waves = value
             else:
-                self._waves = [sig.SigGen(num_points=self.wave_len).arb(x) for x in value]
+                self._waves = [
+                    sig.SigGen(num_points=self.wave_len).arb(x) for x in value
+                ]
 
         else:
             raise ValueError("Waves must be a sequence with length > 0")
 
     def clear(self):
-        """ Clear the wavetable so that all slots contain zero """
+        """Clear the wavetable so that all slots contain zero"""
 
         self.waves = []
 
@@ -84,7 +83,9 @@ class WaveTable:
             if self.waves:
                 self.wave_len = len(self._waves[0])
             else:
-                raise ValueError("Set wave_len or waves before calling get_wave_at_index")
+                raise ValueError(
+                    "Set wave_len or waves before calling get_wave_at_index"
+                )
 
         if index >= len(self.waves):
             return np.zeros(self.wave_len)
@@ -92,7 +93,7 @@ class WaveTable:
         return sig.SigGen(num_points=self.wave_len).arb(self._waves[index])
 
     def get_waves(self):
-        """ Get all of the waves in the table """
+        """Get all of the waves in the table"""
 
         for i in range(self.num_slots):
             yield self.get_wave_at_index(i)
@@ -128,7 +129,7 @@ class WaveTable:
                 data = np.tile(data, 2)
 
             while True:
-                data = data[:data.size - (data.size % num_sections)]
+                data = data[: data.size - (data.size % num_sections)]
                 sections = np.split(data, num_sections)
                 try:
                     self.waves = [dsp.resynthesize(s, sig_gen) for s in sections]
@@ -148,13 +149,13 @@ class WaveTable:
         return self
 
     def morph_with(self, other, in_place=False):
-        """ Morph waves with contents of another wavetable
+        """Morph waves with contents of another wavetable
 
-            @param other WaveTable : other wavetable
+        @param other WaveTable : other wavetable
 
-            @param in_place bool : If True, this WaveTable will be modified.
-                If False, a new WaveTable will be created with the result of
-                the morph
+        @param in_place bool : If True, this WaveTable will be modified.
+            If False, a new WaveTable will be created with the result of
+            the morph
         """
 
         waves = [None for _ in range(self.num_slots)]
@@ -174,18 +175,18 @@ class WaveTable:
         return WaveTable(self.num_slots, waves=waves, wave_len=self.wave_len)
 
     def to_wav(self, filename, samplerate=44100):
-        """ Write the wavetable to a wav file
+        """Write the wavetable to a wav file
 
-            @param filename str : wav file name
-            @param samplerate int : sample rate in Hz
+        @param filename str : wav file name
+        @param samplerate int : sample rate in Hz
         """
 
         wavfile.write_wavetable(self, filename, samplerate)
 
     def to_h2p(self, filename):
-        """ Write the wavetable to a Zebra2 hp2 file
+        """Write the wavetable to a Zebra2 hp2 file
 
-            @param filename str : wav file name
+        @param filename str : wav file name
         """
 
         zosc.write_wavetable(self, filename)

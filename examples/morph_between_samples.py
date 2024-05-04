@@ -5,12 +5,12 @@ This example creates a wave table by interpolating between two or more user-defi
 (single-cycle) samples. Result is written to an output WAV file.
 """
 
-import sys
 import argparse
+import sys
+
 import soundfile as sf
-from osc_gen import wavetable
-from osc_gen import sig
-from osc_gen import visualize
+
+from osc_gen import sig, visualize, wavetable
 
 
 def parse_command_line():
@@ -18,23 +18,16 @@ def parse_command_line():
 
     # Create parser
     parser = argparse.ArgumentParser(
-        description="Interpolate 2 or more single-cycle samples to wave table, " \
-                    "and write result to WAV file.")
+        description="Interpolate 2 or more single-cycle samples to wave table, "
+        "and write result to WAV file."
+    )
 
     # Add arguments
-    parser.add_argument('slots',
-                        action="store",
-                        type=int,
-                        help="number of slots")
-    parser.add_argument('file_out',
-                        action="store",
-                        type=str,
-                        help="output WAV file")
-    parser.add_argument('samples_in',
-                        action="store",
-                        type=str,
-                        nargs='+',
-                        help="input samples")
+    parser.add_argument("slots", action="store", type=int, help="number of slots")
+    parser.add_argument("file_out", action="store", type=str, help="output WAV file")
+    parser.add_argument(
+        "samples_in", action="store", type=str, nargs="+", help="input samples"
+    )
 
     # Parse arguments
     args = parser.parse_args()

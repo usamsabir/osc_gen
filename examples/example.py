@@ -27,27 +27,21 @@ This file is part of osc_gen.
 #     - use the wavfile module to store wavetables as a wav file
 
 
-
 import os
 
 import numpy as np
-from osc_gen import visualize
-from osc_gen import wavetable
-from osc_gen import wavfile
-from osc_gen import zosc
-from osc_gen import sig
-from osc_gen import dsp
+
+from osc_gen import dsp, sig, visualize, wavetable, wavfile, zosc
 
 STORE_FILES = True
 SHOW_PLOTS = True
 
 
 def make_osc_path():
-    """ Create or derive the path in which to store generated oscillator files.
-    """
+    """Create or derive the path in which to store generated oscillator files."""
 
-    home = '.'
-    osc_path = 'example_files'
+    home = "."
+    osc_path = "example_files"
     if not os.path.exists(osc_path):
         os.mkdir(osc_path)
 
@@ -55,20 +49,20 @@ def make_osc_path():
 
 
 def render(zwt, name):
-    """ Write to file or plot a wavetable """
+    """Write to file or plot a wavetable"""
 
     if STORE_FILES:
         osc_path = make_osc_path()
-        fname = name + '.h2p'
+        fname = name + ".h2p"
         zosc.write_wavetable(zwt, os.path.join(osc_path, fname))
-        fname = name + '.wav'
+        fname = name + ".wav"
         wavfile.write_wavetable(zwt, os.path.join(osc_path, fname))
     if SHOW_PLOTS:
         visualize.plot_wavetable(zwt, title=name)
 
 
 def main():
-    """ main """
+    """main"""
 
     # create a signal generator
     sig_gen = sig.SigGen()
@@ -88,12 +82,12 @@ def main():
     # the resulting oscillator in zebra will contain the saw. the remaining
     # slots will be empty, because we haven't added anything to those yet.
 
-    render(zwt, 'osc_gen_saw')
+    render(zwt, "osc_gen_saw")
 
     # you could fill all 16 slots with the same saw, by repeating it 16 times
     zwt.waves = [saw_wave for _ in range(16)]
 
-    render(zwt, 'osc_gen_saw_16')
+    render(zwt, "osc_gen_saw_16")
 
     # example 2: morphing between two waveforms we can use up all 16 slots in
     # the zebra oscillator, even with fewer than 16 starting waveforms, if we
@@ -103,26 +97,25 @@ def main():
     # morph from sine to triangle over 16 slots
     zwt.waves = sig.morph((sig_gen.sin(), sig_gen.tri()), 16)
 
-    render(zwt, 'osc_gen_sin_tri')
+    render(zwt, "osc_gen_sin_tri")
 
     # of course, we don't have to use all 16 slots. we could use only the first
     # 5, for example.
     # morph from sine to triangle over 5 slots
     zwt.waves = sig.morph((sig_gen.sin(), sig_gen.tri()), 5)
 
-    render(zwt, 'osc_gen_sin_tri_5')
+    render(zwt, "osc_gen_sin_tri_5")
 
     # example 3: morphing between many waveforms
     # it is possible to morph between any number of waveforms, to produce
     # interpolated waves between the given waves.
 
     # morph between sine, triangle, saw and square over 16 slots
-    zwt.waves = sig.morph((sig_gen.sin(),
-                           sig_gen.tri(),
-                           sig_gen.saw(),
-                           sig_gen.sqr()), 16)
+    zwt.waves = sig.morph(
+        (sig_gen.sin(), sig_gen.tri(), sig_gen.saw(), sig_gen.sqr()), 16
+    )
 
-    render(zwt, 'osc_gen_sin_tri_saw_sqr')
+    render(zwt, "osc_gen_sin_tri_saw_sqr")
 
     # example 4: generting arbitrary waves
     # a custom signal can be used as an oscillator.
@@ -131,10 +124,11 @@ def main():
 
     # the custom signal generator function automatically normaises and scales
     # any data you throw at it to the right ranges, which is useful.
-    zwt.waves = [sig_gen.arb(np.random.uniform(low=-1, high=1, size=128))
-                 for _ in range(16)]
+    zwt.waves = [
+        sig_gen.arb(np.random.uniform(low=-1, high=1, size=128)) for _ in range(16)
+    ]
 
-    render(zwt, 'osc_gen_random')
+    render(zwt, "osc_gen_random")
 
     # example 5: pulse-width modulation
     # SigGen has a pulse wave generator too.
@@ -143,12 +137,12 @@ def main():
     # pulse widths are between 0 and 1 (0 to 100%).  0 and 1 are silent as the
     # pulse is a flat line.  so, we want to have 16 different, equally spaced
     # pulse widths, increasing in duration, but also avoid any silence:
-    pws = (i / 17. for i in range(1, 17))
+    pws = (i / 17.0 for i in range(1, 17))
 
     # generate the 16 pulse waves
     zwt.waves = [sig_gen.pls(p) for p in pws]
 
-    render(zwt, 'osc_gen_pwm')
+    render(zwt, "osc_gen_pwm")
 
     # example 6: other wave shapes
     # Other wave shapes are supported by the SigGen class, including:
@@ -158,7 +152,7 @@ def main():
 
     zwt.waves = [sig_gen.sharkfin(), sig_gen.exp_saw(), sig_gen.sqr_saw()]
 
-    render(zwt, 'shark_exp_sqrsaw')
+    render(zwt, "shark_exp_sqrsaw")
 
     # example 7: processing wave forms
     # the dsp module can be used to process waves in various ways
@@ -180,12 +174,9 @@ def main():
     dsp.normalize(slewed_square)
 
     # morph between the waves over 16 slots
-    zwt.waves = sig.morph((downsampled,
-                           slewed,
-                           quantized,
-                           slewed_square), 16)
+    zwt.waves = sig.morph((downsampled, slewed, quantized, slewed_square), 16)
 
-    render(zwt, 'osc_gen_dsp')
+    render(zwt, "osc_gen_dsp")
 
     # example 8: longer wavetables, more processing and writing a wav file
 
@@ -199,16 +190,17 @@ def main():
     mc_sig_gen.num_points = 337
 
     # create ever-decreasing wave folding distortion over the wavetable
-    lwt.waves = [dsp.fold(mc_sig_gen.sin(), (lwt.num_slots - i) / 50.)
-                 for i in range(lwt.num_slots)]
+    lwt.waves = [
+        dsp.fold(mc_sig_gen.sin(), (lwt.num_slots - i) / 50.0)
+        for i in range(lwt.num_slots)
+    ]
 
-    wavfile.write_wavetable(lwt, os.path.join(make_osc_path(), 'folding.wav'))
+    wavfile.write_wavetable(lwt, os.path.join(make_osc_path(), "folding.wav"))
 
     # create ever-increasing wave shaping distortion over the wavetable
-    lwt.waves = [dsp.shape(mc_sig_gen.sin(), power=i + 1)
-                 for i in range(lwt.num_slots)]
+    lwt.waves = [dsp.shape(mc_sig_gen.sin(), power=i + 1) for i in range(lwt.num_slots)]
 
-    wavfile.write_wavetable(lwt, os.path.join(make_osc_path(), 'shaping.wav'))
+    wavfile.write_wavetable(lwt, os.path.join(make_osc_path(), "shaping.wav"))
 
 
 if __name__ == "__main__":

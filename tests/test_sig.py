@@ -19,20 +19,21 @@ This file is part of osc_gen.
 """
 
 from __future__ import division
-import pytest
+
 import numpy as np
+import pytest
 
 from osc_gen import sig
 
 
 @pytest.fixture(scope="module")
 def fxsg():
-    """ SigGen fixture """
+    """SigGen fixture"""
     return sig.SigGen()
 
 
 def test_saw(fxsg):  # pylint: disable=redefined-outer-name
-    """ test saw wave """
+    """test saw wave"""
 
     fxsg.num_points = 1 << 16
 
@@ -47,7 +48,7 @@ def test_saw(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_tri(fxsg):  # pylint: disable=redefined-outer-name
-    """ test tri wave """
+    """test tri wave"""
 
     fxsg.num_points = 1 << 16
 
@@ -64,7 +65,7 @@ def test_tri(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_sqr(fxsg):  # pylint: disable=redefined-outer-name
-    """ test sqr wave """
+    """test sqr wave"""
 
     fxsg.num_points = 1 << 16
 
@@ -79,7 +80,7 @@ def test_sqr(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_sin(fxsg):  # pylint: disable=redefined-outer-name
-    """ test sin wave """
+    """test sin wave"""
 
     fxsg.num_points = 1 << 16
     sin = fxsg.sin()
@@ -98,7 +99,7 @@ def test_sin(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_pls_width(fxsg):  # pylint: disable=redefined-outer-name
-    """ test pls wave width """
+    """test pls wave width"""
 
     fxsg.num_points = 11
     assert np.all(fxsg.pls(-1) == np.ones(fxsg.num_points))
@@ -109,7 +110,7 @@ def test_pls_width(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_arb(fxsg):  # pylint: disable=redefined-outer-name
-    """ test arb wave """
+    """test arb wave"""
 
     fxsg.num_points = 10
     sin = fxsg.sin()
@@ -119,7 +120,7 @@ def test_arb(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_morph_same(fxsg):  # pylint: disable=redefined-outer-name
-    """ test morphing same signal """
+    """test morphing same signal"""
 
     fxsg.num_points = 10
     saw = fxsg.saw()
@@ -129,7 +130,7 @@ def test_morph_same(fxsg):  # pylint: disable=redefined-outer-name
 
 
 def test_morph(fxsg):  # pylint: disable=redefined-outer-name
-    """ test morph """
+    """test morph"""
 
     fxsg.num_points = 3
     saw = fxsg.saw()
