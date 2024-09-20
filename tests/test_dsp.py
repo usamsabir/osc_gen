@@ -19,7 +19,8 @@ This file is part of osc_gen.
 """
 
 from __future__ import division
-
+import inspect
+import math
 import numpy as np
 
 from osc_gen import dsp
@@ -202,3 +203,120 @@ def test_resynthesize():
     s.num_points = 32
     o = dsp.resynthesize(a, s)
     assert np.all(np.abs(o - e) < 0.01)
+
+def generate_test_signal(n):
+    """Generate a test signal of length n."""
+    return [math.sin(2 * math.pi * 10 * t / n) + 0.5 * math.sin(2 * math.pi * 20 * t / n) for t in range(n)]
+
+def test_fft_and_ifft():
+    # Generate a test signal
+    n = 128  # Use a power of 2 for simplicity
+    x = generate_test_signal(n)
+
+    # Apply FFT
+    X = fft(x)
+
+    # Compare with NumPy's FFT
+    X_np = np.fft.fft(x)
+    fft_max_error = np.max(np.abs(X - X_np))
+    print(f"Maximum error between custom FFT and NumPy FFT: {fft_max_error:.2e}")
+    print(f"FFT test {'passed' if fft_max_error < 1e-10 else 'failed'}")
+
+    # Apply inverse FFT
+    x_reconstructed = ifft(X)
+
+    # Check if the reconstructed signal matches the original
+    ifft_max_error = max(abs(x[i] - x_reconstructed[i].real) for i in range(n))
+    print(f"Maximum error between original and reconstructed signal: {ifft_max_error:.2e}")
+    print(f"IFFT test {'passed' if ifft_max_error < 1e-10 else 'failed'}")
+
+    # Print the first few values of the original and reconstructed signals
+    print("\nFirst few values of the original signal:")
+    print(x[:5])
+    print("\nFirst few values of the reconstructed signal:")
+    print([complex(round(val.real, 4), round(val.imag, 4)) for val in x_reconstructed[:5]])
+
+    # Print the first few FFT coefficients
+    print("\nFirst few FFT coefficients (custom implementation):")
+    print([complex(round(val.real, 4), round(val.imag, 4)) for val in X[:5]])
+
+    print("\nFirst few FFT coefficients (NumPy implementation):")
+    print([complex(round(val.real, 4), round(val.imag, 4)) for val in X_np[:5]])
+
+def test_signal_mixer():
+    # Test case 1: Addition
+    signal1 = [[1.0, 2.0], [3.0, 4.0]]
+    signal2 = [[0.5, 1.5], [2.5, 3.5]]
+    result = signal_mixer(signal1, signal2, 'addition')
+    expected = [[1.5, 3.5], [5.5, 7.5]]
+    assert result == expected, f"Addition test failed. Expected {expected}, but got {result}"
+
+    # Test case 2: Subtraction
+    result = signal_mixer(signal1, signal2, 'subtraction')
+    expected = [[0.5, 0.5], [0.5, 0.5]]
+    assert result == expected, f"Subtraction test failed. Expected {expected}, but got {result}"
+
+    # Test case 3: Inverse
+    signal3 = [[1.0, 2.0], [3.0, 4.0]]
+    result = signal_mixer(signal3, [], 'inverse')
+    expected = [[-2.0, 1.0], [1.5, -0.5]]
+    assert result == expected, f"Inverse test failed. Expected {expected}, but got {result}"
+
+
+def test_addition_dimension_mismatch():
+    signal1 = [[1, 2], [3, 4]]
+    signal2 = [[1, 2, 3], [4, 5, 6]]
+    try:
+        signal_mixer(signal1, signal2, 'addition')
+        print("Test failed: addition_dimension_mismatch")
+    except ValueError:
+        print("Test passed: addition_dimension_mismatch")
+
+def test_subtraction_dimension_mismatch():
+    signal1 = [[1, 2, 3], [4, 5, 6]]
+    signal2 = [[1, 2], [3, 4]]
+    try:
+        signal_mixer(signal1, signal2, 'subtraction')
+        print("Test failed: subtraction_dimension_mismatch")
+    except ValueError:
+        print("Test passed: subtraction_dimension_mismatch")
+
+def test_inverse_non_invertible_matrix():
+    signal1 = [[1, 2], [2, 4]]  # This matrix is not invertible
+    try:
+        signal_mixer(signal1, [], 'inverse')
+        print("Test failed: inverse_non_invertible_matrix")
+    except ValueError:
+        print("Test passed: inverse_non_invertible_matrix")
+
+def test_inverse_non_square_matrix():
+    signal1 = [[1, 2, 3], [4, 5, 6]]
+    try:
+        signal_mixer(signal1, [], 'inverse')
+        print("Test failed: inverse_non_square_matrix")
+    except ValueError:
+        print("Test passed: inverse_non_square_matrix")
+
+def check_np_usage(func):
+    """
+    Check if 'np.' is used in the function.
+    Returns True if 'np.' is found, False otherwise.
+    """
+    source = inspect.getsource(func)
+    return 'np.' in source
+
+def test_np_usage():
+
+    # Test fft function
+    fft_uses_np = check_np_usage(fft)
+    print(f"fft function uses np.: {fft_uses_np}")
+    assert False == fft_uses_np, "fft function should not use np."
+
+    # Test ifft function
+    ifft_uses_np = check_np_usage(ifft)
+    print(f"ifft function uses np.: {ifft_uses_np}")
+    assert False == ifft_uses_np, "ifft function should not use np."
+
+    signal_mixer_uses_np = check_np_usage(signal_mixer)
+    print(f"signal_mixer function uses np.: {signal_mixer_uses_np}")
+    assert False == signal_mixer_uses_np, "ifft function should not use np."
