@@ -20,6 +20,7 @@ This file is part of osc_gen.
 
 from __future__ import division
 
+import cmath
 import math
 from copy import deepcopy
 
@@ -27,13 +28,13 @@ import numpy as np
 
 
 class NotEnoughSamplesError(Exception):
-    """ Not Enough Samples """
+    """Not Enough Samples"""
 
 
 def normalize(inp):
-    """ Normalize a signal to the range +/- 1
+    """Normalize a signal to the range +/- 1
 
-        @param inp seq : A sequence of samples
+    @param inp seq : A sequence of samples
     """
 
     dc_bias = (np.amax(inp) + np.amin(inp)) / 2
@@ -47,12 +48,12 @@ def normalize(inp):
 
 
 def mix(inp_a, inp_b, amount=0.5):
-    """ Mix two signals together.
+    """Mix two signals together.
 
-        @param inp_a np.ndarray : first input
-        @param inp_b np.ndarray : seconds input
-        @param amount float : mix amount, 0 outputs only inp_a, 1 outputs only
-            inp_b, values between 0 and 1 output a propotional mix of the two.
+    @param inp_a np.ndarray : first input
+    @param inp_b np.ndarray : seconds input
+    @param amount float : mix amount, 0 outputs only inp_a, 1 outputs only
+        inp_b, values between 0 and 1 output a propotional mix of the two.
     """
 
     amount = np.clip(amount, 0, 1)
@@ -61,28 +62,28 @@ def mix(inp_a, inp_b, amount=0.5):
 
 
 def clip(inp, amount, bias=0):
-    """ Hard-clip a signal
+    """Hard-clip a signal
 
-        @param inp seq : A sequence of samples
-        @param amount number : Amount of clipping
-        @param bias number : Pre-distortion DC bias
+    @param inp seq : A sequence of samples
+    @param amount number : Amount of clipping
+    @param bias number : Pre-distortion DC bias
     """
 
     gain = 1 + amount
 
     inp += bias
     inp *= gain
-    np.clip(inp, -1., 1., out=inp)
+    np.clip(inp, -1.0, 1.0, out=inp)
 
     return normalize(inp)
 
 
 def tube(inp, amount, bias=0):
-    """ Tube saturate a signal
+    """Tube saturate a signal
 
-        @param inp seq : A sequence of samples
-        @param amount number : Amount of distortion
-        @param bias number : Pre-distortion DC bias
+    @param inp seq : A sequence of samples
+    @param amount number : Amount of distortion
+    @param bias number : Pre-distortion DC bias
     """
 
     gain = 1 + amount
@@ -95,11 +96,11 @@ def tube(inp, amount, bias=0):
 
 
 def fold(inp, amount, bias=0):
-    """ Perform wave folding
+    """Perform wave folding
 
-        @param inp seq : A sequence of samples
-        @param amount number : Amount of distortion
-        @param bias number : Pre-distortion DC bias
+    @param inp seq : A sequence of samples
+    @param amount number : Amount of distortion
+    @param bias number : Pre-distortion DC bias
     """
 
     gain = 1 + amount
@@ -116,13 +117,13 @@ def fold(inp, amount, bias=0):
 
 
 def shape(inp, amount=1, bias=0, power=3):
-    """ Perform polynomial waveshaping
+    """Perform polynomial waveshaping
 
-        @param inp seq : A sequence of samples
-        @param amount number : Amount of shaping
-            (1: maximum shaping, 0: no shaping)
-        @param bias number : Pre-distortion DC bias
-        @param power number : Polynomial power
+    @param inp seq : A sequence of samples
+    @param amount number : Amount of shaping
+        (1: maximum shaping, 0: no shaping)
+    @param bias number : Pre-distortion DC bias
+    @param power number : Polynomial power
     """
 
     biased = inp + bias
@@ -136,21 +137,21 @@ def shape(inp, amount=1, bias=0, power=3):
     shaped -= bias
     normalize(shaped)
 
-    inp *= (1 - amount)
+    inp *= 1 - amount
     inp += shaped * amount
 
     return normalize(inp)
 
 
 def slew(inp, rate, inv=False):
-    """ Apply slew or overhoot to a signal. Slew smooths steep transients in
-        the signal while overshoot results in a sharper transient with
-        ringing.
+    """Apply slew or overhoot to a signal. Slew smooths steep transients in
+    the signal while overshoot results in a sharper transient with
+    ringing.
 
-        @param rate float : Slew rate, between 0 and 1
-        @param inp seq : A sequence of samples
-        @param inv bool : If True, overshoot will be applied. if False,
-                          slew will be applied. (default=False).
+    @param rate float : Slew rate, between 0 and 1
+    @param inp seq : A sequence of samples
+    @param inv bool : If True, overshoot will be applied. if False,
+                      slew will be applied. (default=False).
     """
 
     if inv:
@@ -174,15 +175,14 @@ def slew(inp, rate, inv=False):
 
 
 def downsample(inp, factor):
-    """ Reduce the effective sample rate of a signal, resulting in aliasing.
+    """Reduce the effective sample rate of a signal, resulting in aliasing.
 
-        @param inp seq : A sequence of samples
-        @param factor int : Downsampling factor
+    @param inp seq : A sequence of samples
+    @param factor int : Downsampling factor
     """
 
     if factor < 1:
-        raise ValueError(
-            "Downsampling factor ({0}) cannot be < 1".format(factor))
+        raise ValueError(f"Downsampling factor ({factor}) cannot be < 1")
 
     if factor == 1:
         return inp
@@ -198,13 +198,13 @@ def downsample(inp, factor):
 
 
 def quantize(inp, depth):
-    """ Reduce the bit depth of a signal.
+    """Reduce the bit depth of a signal.
 
-        @param inp seq : A sequence of samples
-        @param depth number : New bit depth in bits
+    @param inp seq : A sequence of samples
+    @param depth number : New bit depth in bits
     """
 
-    scale = 2 ** depth - 1
+    scale = 2**depth - 1
 
     for i, val in enumerate(inp):
         if val > 0:
@@ -216,7 +216,7 @@ def quantize(inp, depth):
 
 
 def fundamental(inp, fs):
-    """ Find the fundamental frequency in Hz of a given input """
+    """Find the fundamental frequency in Hz of a given input"""
 
     window = np.hamming(inp.size)
     sig = np.fft.fft(inp * window)
@@ -227,7 +227,7 @@ def fundamental(inp, fs):
 
 
 def harmonic_series(inp):
-    """ Find the harmonic series of a periodic input """
+    """Find the harmonic series of a periodic input"""
 
     fft_mult = min(64, inp.size // 501)
     fft_mult = max(fft_mult, 1)
@@ -244,8 +244,8 @@ def harmonic_series(inp):
     fft_half = 1024 * fft_mult
     buf = np.zeros(fft_half)
     buf[:idx1] = windowed[idx2:]
-    buf[fft_half - idx2:] = windowed[:idx2]
-    fft = np.fft.fft(buf)[:fft_half // 2]
+    buf[fft_half - idx2 :] = windowed[:idx2]
+    fft = np.fft.fft(buf)[: fft_half // 2]
 
     # peak amplitude assumed to be fundamental frequency
     i_fund = np.argmax(np.abs(fft))
@@ -256,8 +256,11 @@ def harmonic_series(inp):
     # frequency
     start = i_fund // 4
     harmonics = np.array(
-        [fft[i - start:i + start][np.abs(fft[i - start:i + start]).argmax()]
-         for i in range(i_fund, fft_half // 2, i_fund)])
+        [
+            fft[i - start : i + start][np.abs(fft[i - start : i + start]).argmax()]
+            for i in range(i_fund, fft_half // 2, i_fund)
+        ]
+    )
 
     # normalize magnitude and phase
     hs_amp = np.abs(harmonics)
@@ -268,10 +271,10 @@ def harmonic_series(inp):
 
 
 def slice_cycles(inp, n, fs):
-    """ Extact n single-cycle slices from a signal """
+    """Extact n single-cycle slices from a signal"""
 
     def nearest(arr, val):
-        """ find the nearest value in an array to a given value """
+        """find the nearest value in an array to a given value"""
         return arr[np.argmin(np.abs(arr - val))]
 
     zero_crossings = np.where(np.diff(np.sign(inp)) > 0)[0] + 1
@@ -287,7 +290,7 @@ def slice_cycles(inp, n, fs):
     slots = np.around(slots).astype(int)
     slots = np.unique([nearest(zero_crossings, slot) for slot in slots])
 
-    return [inp[x:x + int(samples_per_cycle)] for x in slots]
+    return [inp[x : x + int(samples_per_cycle)] for x in slots]
 
 
 def resynthesize(inp, sig_gen):
@@ -314,3 +317,86 @@ def resynthesize(inp, sig_gen):
             break
 
     return normalize(outp)
+
+def fft(x):
+    N = len(x)
+
+    # Base case for recursion
+    if N <= 1:
+        return x
+
+    # Recursive case
+    even = fft(x[0::2])
+    odd = fft(x[1::2])
+
+    # Combine
+    T = [cmath.exp(-2j * math.pi * k / N) * odd[k] for k in range(N // 2)]
+    return [even[k] + T[k] for k in range(N // 2)] + [even[k] - T[k] for k in range(N // 2)]
+
+def ifft(X):
+    N = len(X)
+
+    # Compute the inverse FFT
+    x = fft([X[k].conjugate() for k in range(N)])
+
+    # Scale the result
+    return [x[k].conjugate() / N for k in range(N)]
+
+def signal_mixer(signal1: list[list[float]], signal2: list[list[float]], operation: str) -> list[list[float]]:
+    """
+    Performs operations on two input signals represented as 2D lists.
+    Args:
+        signal1: First input signal as a 2D list.
+        signal2: Second input signal as a 2D list.
+        operation: The operation to perform ('addition', 'subtraction', 'inverse').
+    Returns:
+        A new 2D list representing the result of the operation.
+    Raises:
+        ValueError: If invalid input or operation is provided.
+    """
+    rows1 = len(signal1)
+    cols1 = len(signal1[0]) if rows1 > 0 else 0
+    rows2 = len(signal2)
+    cols2 = len(signal2[0]) if rows2 > 0 else 0
+
+    if operation == 'addition':
+        if rows1 != rows2 or cols1 != cols2:
+            raise ValueError("Invalid")
+        return [[signal1[i][j] + signal2[i][j] for j in range(cols1)] for i in range(rows1)]
+
+    elif operation == 'subtraction':
+        if rows1 != rows2 or cols1 != cols2:
+            raise ValueError("Invalid")
+        return [[signal1[i][j] - signal2[i][j] for j in range(cols1)] for i in range(rows1)]
+
+    elif operation == 'inverse':
+        if rows1 != cols1:
+            raise ValueError("Invalid")
+
+        n = rows1
+        # Create an augmented matrix [A|I]
+        augmented = [row[:] + [1 if i == j else 0 for j in range(n)] for i, row in enumerate(signal1)]
+
+        # Gaussian elimination
+        for i in range(n):
+            if augmented[i][i] == 0:
+                raise ValueError("Invalid")
+
+            # Make the diagonal element 1
+            factor = augmented[i][i]
+            for j in range(2 * n):
+                augmented[i][j] /= factor
+
+            # Make other elements in the column 0
+            for k in range(n):
+                if k != i:
+                    factor = augmented[k][i]
+                    for j in range(2 * n):
+                        augmented[k][j] -= factor * augmented[i][j]
+
+        # Extract the inverse matrix
+        inverse = [row[n:] for row in augmented]
+        return inverse
+
+    else:
+        raise ValueError("Invalid")

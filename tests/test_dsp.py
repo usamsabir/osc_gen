@@ -25,6 +25,7 @@ import numpy as np
 
 from osc_gen import dsp
 from osc_gen import sig
+from osc_gen.dsp import ifft, fft, signal_mixer
 
 
 def test_normalize():
